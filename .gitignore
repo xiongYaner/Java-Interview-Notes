@@ -31,6 +31,13 @@ update_raw_content.py
 update_specific_block.py
 
 # 项目配置文件
+AGENTS.md
+BOOTSTRAP.md
+HEARTBEAT.md
+IDENTITY.md
+SOUL.md
+TOOLS.md
+USER.md
 canvas/
 skills/
 
