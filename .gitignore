@@ -1,0 +1,56 @@
+# 辅助脚本和配置文件
+check_api_response.py
+check_api_structure.py
+check_permissions.py
+debug_api.py
+fetch_feishu_api_docs.py
+get_api_help.py
+get_doc_history.py
+get_official_docs.py
+search_block_api.py
+search_feishu_api_doc.py
+search_feishu_docs.py
+search_github_block_api.py
+search_github_code.py
+search_github_examples.py
+search_github_feishu_docs.py
+test_api_params.py
+try_api_paths.py
+try_content_apis.py
+update_block_with_details.py
+update_blocks.py
+update_feishu_api_test.py
+update_feishu_block_api.py
+update_feishu_doc.py
+update_feishu_docx.py
+update_feishu_simple.py
+update_feishu_simpler.py
+update_feishu_with_lark_oapi.py
+update_feishu_with_sdk.py
+update_raw_content.py
+update_specific_block.py
+
+# 项目配置文件
+canvas/
+skills/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 编译产物
+*.class
+*.jar
+*.war
+*.ear
+
+# 测试报告
+target/
+build/
+
+# 日志文件
+*.log
+
+# 临时文件
+*.tmp
+*.temp
