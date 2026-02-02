@@ -1,4 +1,4 @@
-package com.common.utils.mq;
+package com.mq.utils;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -7,6 +7,8 @@ import com.rabbitmq.client.MessageProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -77,14 +79,16 @@ public class RabbitMQProducer implements MQProducer {
             String delayedQueue = topic + "_delayed_queue";
 
             channel.exchangeDeclare(delayedExchange, "x-delayed-message", true, false,
-                    java.util.Map.of("x-delayed-type", "direct"));
+                    Map.of("x-delayed-type", "direct"));
             channel.queueDeclare(delayedQueue, true, false, false,
-                    java.util.Map.of("x-dead-letter-exchange", "", "x-dead-letter-routing-key", topic));
+                    Map.of("x-dead-letter-exchange", "", "x-dead-letter-routing-key", topic));
             channel.queueBind(delayedQueue, delayedExchange, topic);
 
-            channel.basicPublish(delayedExchange, topic,
-                    java.util.Map.of("x-delay", String.valueOf(delay)),
-                    message.getBytes());
+            com.rabbitmq.client.AMQP.BasicProperties properties = new com.rabbitmq.client.AMQP.BasicProperties.Builder()
+                    .headers(Map.of("x-delay", delay))
+                    .build();
+
+            channel.basicPublish(delayedExchange, topic, properties, message.getBytes());
 
             logger.info("Sent delayed message to RabbitMQ ({}ms): {}", delay, message);
         } catch (Exception e) {
@@ -97,7 +101,7 @@ public class RabbitMQProducer implements MQProducer {
         try {
             String exchange = topic + "_exchange";
             channel.exchangeDeclare(exchange, "direct", true);
-            channel.queueDecl(topic, true, false, false, null);
+            channel.queueDeclare(topic, true, false, false, null);
             channel.queueBind(topic, exchange, tag);
             channel.basicPublish(exchange, tag, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes());
             logger.info("Sent message to RabbitMQ with tag {}: {}", tag, message);

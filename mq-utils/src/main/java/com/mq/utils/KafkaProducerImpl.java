@@ -1,9 +1,6 @@
-package com.common.utils.mq;
+package com.mq.utils;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.clients.producer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,14 +9,14 @@ import java.util.Properties;
 /**
  * Kafka 生产者实现
  */
-public class KafkaProducer implements MQProducer {
+public class KafkaProducerImpl implements MQProducer {
 
-    private static final Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
+    private static final Logger logger = LoggerFactory.getLogger(KafkaProducerImpl.class);
 
     private final MQConfig.KafkaConfig config;
     private Producer<String, String> producer;
 
-    public KafkaProducer(MQConfig.KafkaConfig config) {
+    public KafkaProducerImpl(MQConfig.KafkaConfig config) {
         this.config = config;
         init();
     }
@@ -29,14 +26,14 @@ public class KafkaProducer implements MQProducer {
      */
     private void init() {
         Properties props = new Properties();
-        props.put("bootstrap.servers", config.getBootstrapServers());
-        props.put("acks", "all");
-        props.put("retries", 0);
-        props.put("batch.size", 16384);
-        props.put("linger.ms", 1);
-        props.put("buffer.memory", 33554432);
-        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        props.put(ProducerConfig.RETRIES_CONFIG, 0);
+        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
+        props.put(ProducerConfig.LINGER_MS_CONFIG, 1);
+        props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
 
         producer = new org.apache.kafka.clients.producer.KafkaProducer<>(props);
         logger.info("Kafka producer initialized successfully");
@@ -45,7 +42,8 @@ public class KafkaProducer implements MQProducer {
     @Override
     public void sendMessage(String topic, String message) {
         try {
-            producer.send(new ProducerRecord<>(topic, message));
+            ProducerRecord<String, String> record = new ProducerRecord<>(topic, message);
+            producer.send(record);
             logger.info("Sent message to Kafka: {}", message);
         } catch (Exception e) {
             logger.error("Failed to send message to Kafka", e);
@@ -55,13 +53,17 @@ public class KafkaProducer implements MQProducer {
     @Override
     public void sendMessage(String topic, String message, SendCallback callback) {
         try {
-            producer.send(new ProducerRecord<>(topic, message), (metadata, exception) -> {
-                if (exception == null) {
-                    logger.info("Sent message to Kafka: {}", message);
-                    callback.onSuccess();
-                } else {
-                    logger.error("Failed to send message to Kafka", exception);
-                    callback.onFailure(exception);
+            ProducerRecord<String, String> record = new ProducerRecord<>(topic, message);
+            producer.send(record, new org.apache.kafka.clients.producer.Callback() {
+                @Override
+                public void onCompletion(RecordMetadata metadata, Exception exception) {
+                    if (exception == null) {
+                        logger.info("Sent message to Kafka: {}", message);
+                        callback.onSuccess();
+                    } else {
+                        logger.error("Failed to send message to Kafka", exception);
+                        callback.onFailure(exception);
+                    }
                 }
             });
         } catch (Exception e) {
@@ -74,7 +76,8 @@ public class KafkaProducer implements MQProducer {
     public void sendMessageWithDelay(String topic, String message, long delay) {
         try {
             String delayedTopic = topic + "_delayed_" + delay;
-            producer.send(new ProducerRecord<>(delayedTopic, message));
+            ProducerRecord<String, String> record = new ProducerRecord<>(delayedTopic, message);
+            producer.send(record);
             logger.info("Sent delayed message to Kafka ({}ms): {}", delay, message);
         } catch (Exception e) {
             logger.error("Failed to send delayed message to Kafka", e);
@@ -85,7 +88,8 @@ public class KafkaProducer implements MQProducer {
     public void sendMessageWithTag(String topic, String tag, String message) {
         try {
             String taggedTopic = topic + "_" + tag;
-            producer.send(new ProducerRecord<>(taggedTopic, message));
+            ProducerRecord<String, String> record = new ProducerRecord<>(taggedTopic, message);
+            producer.send(record);
             logger.info("Sent message to Kafka with tag {}: {}", tag, message);
         } catch (Exception e) {
             logger.error("Failed to send message to Kafka with tag", e);
@@ -95,7 +99,8 @@ public class KafkaProducer implements MQProducer {
     @Override
     public void sendMessageWithPartition(String topic, int partition, String message) {
         try {
-            producer.send(new ProducerRecord<>(topic, partition, null, message));
+            ProducerRecord<String, String> record = new ProducerRecord<>(topic, partition, null, message);
+            producer.send(record);
             logger.info("Sent message to Kafka partition {}: {}", partition, message);
         } catch (Exception e) {
             logger.error("Failed to send message to Kafka partition", e);

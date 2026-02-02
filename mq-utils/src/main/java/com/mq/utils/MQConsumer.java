@@ -1,4 +1,4 @@
-package com.common.utils.mq;
+package com.mq.utils;
 
 /**
  * 消息消费者接口

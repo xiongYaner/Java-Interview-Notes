@@ -1,8 +1,6 @@
-package com.common.utils.mq;
+package com.mq.utils;
 
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,16 +14,16 @@ import java.util.concurrent.Executors;
 /**
  * Kafka 消费者实现
  */
-public class KafkaConsumer implements MQConsumer {
+public class KafkaConsumerImpl implements MQConsumer {
 
-    private static final Logger logger = LoggerFactory.getLogger(KafkaConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(KafkaConsumerImpl.class);
 
     private final MQConfig.KafkaConfig config;
     private org.apache.kafka.clients.consumer.KafkaConsumer<String, String> consumer;
     private ExecutorService executorService;
     private volatile boolean running = false;
 
-    public KafkaConsumer(MQConfig.KafkaConfig config) {
+    public KafkaConsumerImpl(MQConfig.KafkaConfig config) {
         this.config = config;
         init();
     }

@@ -1,72 +1,48 @@
 package com.common.utils.config;
 
-import com.common.utils.mq.MQConfig;
-import com.common.utils.mq.MQFactory;
-import com.common.utils.redis.RedisConfig;
-import com.common.utils.redis.RedisUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import com.common.utils.http.HttpUtil;
+import com.common.utils.math.MathUtil;
+import com.common.utils.utils.CommonUtils;
+import com.common.utils.utils.DateUtil;
+import com.common.utils.utils.FileUtil;
 
 /**
  * 自动配置类
  * 用于 Spring Boot 自动配置工具类
  */
 @Configuration
-@EnableConfigurationProperties({MQConfig.class, RedisConfig.class})
 public class CommonUtilsAutoConfiguration {
 
     /**
-     * Redis 配置
+     * HTTP 工具配置
      */
     @Configuration
-    @ConditionalOnClass({RedisTemplate.class, RedisConnectionFactory.class})
-    public static class RedisConfiguration {
+    @ConditionalOnClass(HttpUtil.class)
+    public static class HttpConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-            RedisTemplate<Object, Object> template = new RedisTemplate<>();
-            template.setConnectionFactory(redisConnectionFactory);
-            template.setKeySerializer(new StringRedisSerializer());
-            template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-            template.setHashKeySerializer(new StringRedisSerializer());
-            template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-            template.afterPropertiesSet();
-            return template;
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
-            return new StringRedisTemplate(redisConnectionFactory);
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public RedisUtil redisUtil() {
-            return new RedisUtil();
+        public HttpUtil httpUtil() {
+            return new HttpUtil();
         }
     }
 
     /**
-     * MQ 配置
+     * 数学工具配置
      */
     @Configuration
-    @ConditionalOnClass(MQFactory.class)
-    public static class MQConfiguration {
+    @ConditionalOnClass(MathUtil.class)
+    public static class MathConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public MQFactory mqFactory() {
-            return new MQFactory();
+        public MathUtil mathUtil() {
+            return new MathUtil();
         }
     }
 
@@ -74,6 +50,41 @@ public class CommonUtilsAutoConfiguration {
      * 通用工具配置
      */
     @Configuration
-    public static class UtilsConfiguration {
+    @ConditionalOnClass(CommonUtils.class)
+    public static class CommonConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public CommonUtils commonUtils() {
+            return new CommonUtils();
+        }
+    }
+
+    /**
+     * 日期工具配置
+     */
+    @Configuration
+    @ConditionalOnClass(DateUtil.class)
+    public static class DateConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public DateUtil dateUtil() {
+            return new DateUtil();
+        }
+    }
+
+    /**
+     * 文件工具配置
+     */
+    @Configuration
+    @ConditionalOnClass(FileUtil.class)
+    public static class FileConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public FileUtil fileUtil() {
+            return new FileUtil();
+        }
     }
 }

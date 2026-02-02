@@ -1,4 +1,4 @@
-package com.common.utils.mq;
+package com.mq.utils;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

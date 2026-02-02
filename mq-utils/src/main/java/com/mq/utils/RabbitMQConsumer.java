@@ -1,4 +1,4 @@
-package com.common.utils.mq;
+package com.mq.utils;
 
 import com.rabbitmq.client.*;
 import org.slf4j.Logger;

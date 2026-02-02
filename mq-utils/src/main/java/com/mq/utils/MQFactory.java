@@ -1,4 +1,4 @@
-package com.common.utils.mq;
+package com.mq.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class MQFactory {
         logger.info("Creating MQ producer for type: {}", mqType);
         return switch (mqType) {
             case RABBITMQ -> new RabbitMQProducer(mqConfig.getRabbitmq());
-            case KAFKA -> new KafkaProducer(mqConfig.getKafka());
+            case KAFKA -> new KafkaProducerImpl(mqConfig.getKafka());
             case ACTIVEMQ -> new ActiveMQProducer(mqConfig.getActivemq());
             case ROCKETMQ -> new RocketMQProducer(mqConfig.getRocketmq());
         };
@@ -53,7 +53,7 @@ public class MQFactory {
         logger.info("Creating MQ consumer for type: {}", mqType);
         return switch (mqType) {
             case RABBITMQ -> new RabbitMQConsumer(mqConfig.getRabbitmq());
-            case KAFKA -> new KafkaConsumer(mqConfig.getKafka());
+            case KAFKA -> new KafkaConsumerImpl(mqConfig.getKafka());
             case ACTIVEMQ -> new ActiveMQConsumer(mqConfig.getActivemq());
             case ROCKETMQ -> new RocketMQConsumer(mqConfig.getRocketmq());
         };
